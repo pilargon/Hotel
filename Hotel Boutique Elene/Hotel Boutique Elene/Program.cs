@@ -226,16 +226,22 @@ namespace HotelBoutiqueElene
 
             //CREAR CODIGO DE RESERVA
             conexion.Open();
-            cadena = "SELECT max(CodReserva)FROM Reservas ";
+            cadena = "SELECT max(CodReserva) AS maximo FROM Reservas";
             comando = new SqlCommand(cadena, conexion);
             SqlDataReader codReservaR = comando.ExecuteReader();
-            int codReserva = Convert.ToInt32(codReservaR.Read()) + 1;
+            int codReserva=0;
+            if (codReservaR.Read())
+            {
+                codReserva = Convert.ToInt32(codReservaR["maximo"].ToString()) + 1;
+            }
 
+            //PONER HABITACION ELEGIDA COMO OCUPADA
             cadena = "UPDATE Habitaciones SET Estado = 'OCUPADO' WHERE codHabitacion LIKE  '" + habEleg + "' ";
             conexion.Close();
             registros.Close();
             conexion.Open();
-            cadena += "INSERT INTO Reservas(CodReserva,FechaCheckIn,DNI,CodHabitacion) values ('" +codReservaR+ "', '" + DateTime.Now + "','" + cdni + "','" + habEleg + "')";
+            //INSERTAR LOS DATOS EN LA TABLA DE RESERVAS
+            cadena += "INSERT INTO Reservas(CodReserva,FechaCheckIn,DNI,CodHabitacion) values ('" +codReserva + "', '" + DateTime.Now + "','" + cdni + "','" + habEleg + "')";
             comando = new SqlCommand(cadena, conexion);
             comando.ExecuteNonQuery();
             conexion.Close();
